@@ -1,0 +1,210 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package ch.heigvd.iict.mvp.snapeat.ui.screen
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
+import ch.heigvd.iict.mvp.snapeat.model.DietaryRestriction
+import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
+
+@Composable
+fun PreferencesScreen(
+    currentPreferences: UserPreferences,
+    onPreferencesChanged: (UserPreferences) -> Unit,
+    onCloseClick: () -> Unit
+) {
+    var budget by remember { mutableStateOf(currentPreferences.budgetPerMeal) }
+    var selectedDietary by remember { mutableStateOf(currentPreferences.dietaryRestrictions.toMutableSet()) }
+    var selectedAllergies by remember { mutableStateOf(currentPreferences.allergies.toMutableSet()) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundBeige)
+    ) {
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Mes préférences",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            IconButton(onClick = onCloseClick) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Fermer"
+                )
+            }
+        }
+
+        // Content
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            // Budget Section
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Budget par repas",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Slider(
+                            value = budget,
+                            onValueChange = { budget = it },
+                            valueRange = 5f..100f,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "%.0f€".format(budget),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 12.dp)
+                        )
+                    }
+                }
+            }
+
+            // Dietary Restrictions
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Régime alimentaire",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        DietaryRestriction.values().forEach { diet ->
+                            FilterChip(
+                                selected = selectedDietary.contains(diet),
+                                onClick = {
+                                    if (selectedDietary.contains(diet)) {
+                                        selectedDietary.remove(diet)
+                                    } else {
+                                        selectedDietary.add(diet)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = diet.name.replace("_", " "),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Allergies
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Allergies et intolérances",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    val allergiesList = listOf("Gluten", "Lactose", "Arachides", "Fruits à coque")
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        allergiesList.forEach { allergy ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Checkbox(
+                                    checked = selectedAllergies.contains(allergy),
+                                    onCheckedChange = {
+                                        if (it) {
+                                            selectedAllergies.add(allergy)
+                                        } else {
+                                            selectedAllergies.remove(allergy)
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = allergy,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Save Button
+            item {
+                Button(
+                    onClick = {
+                        val updated = currentPreferences.copy(
+                            budgetPerMeal = budget,
+                            dietaryRestrictions = selectedDietary.toList(),
+                            allergies = selectedAllergies.toList()
+                        )
+                        onPreferencesChanged(updated)
+                        onCloseClick()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(
+                        text = "Enregistrer",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}

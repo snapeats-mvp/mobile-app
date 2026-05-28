@@ -1,4 +1,4 @@
-package ch.heigvd.mvp.snapeats
+package ch.heigvd.iict.daa.template
 
 import org.junit.Test
 

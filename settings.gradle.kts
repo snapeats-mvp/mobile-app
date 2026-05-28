@@ -19,5 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SnapEats"
+rootProject.name = "daa-template"
 include(":app")
+ 
