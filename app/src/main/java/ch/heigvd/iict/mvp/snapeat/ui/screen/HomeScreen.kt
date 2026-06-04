@@ -1,5 +1,12 @@
 package ch.heigvd.iict.mvp.snapeat.ui.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import ch.heigvd.iict.mvp.snapeat.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,18 +16,58 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
 
 @Composable
 fun HomeScreen(
-    onTakePhotoClick: () -> Unit,
+    onCameraClick: () -> Unit,
+    onGalerieClick: () -> Unit,
     onNavigateToRecipes: () -> Unit
 ) {
+    // Controls whether the image source selection dialog is displayed
+    var showImageSourceDialog by remember {
+        mutableStateOf(false)
+    }
+    // Stores the image selected from the gallery
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null)}
+
+    // Stores the picture captured with the camera
+    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null)}
+
+    // Launcher used to open the device gallery and select an image
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri ->
+            selectedImageUri = uri
+        }
+
+    // Launcher used to open the device camera and capture a picture
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicturePreview()
+        ) { bitmap ->
+            capturedBitmap = bitmap
+        }
+
+    val context = LocalContext.current
+
+    val cameraPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                cameraLauncher.launch()
+            }
+        }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,7 +126,9 @@ fun HomeScreen(
 
         // Take Photo Button
         Button(
-            onClick = onTakePhotoClick,
+            onClick = {
+                showImageSourceDialog = true
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
@@ -122,5 +171,53 @@ fun HomeScreen(
                 fontWeight = FontWeight.Medium
             )
         }
+    }
+
+    if (showImageSourceDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showImageSourceDialog = false
+            },
+            title = {
+                Text("Ajouter une photo")
+            },
+            text = {
+                Column {
+                    Button(
+                        onClick = {
+                            showImageSourceDialog = false
+                            if (ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                cameraLauncher.launch()
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Prendre une photo")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            showImageSourceDialog = false
+                            galleryLauncher.launch("image/*")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Choisir dans la galerie")
+                    }
+                }
+            },
+
+            // No default confirmation button.
+            // The dialog actions are implemented directly inside the content.
+            confirmButton = {}
+        )
     }
 }
