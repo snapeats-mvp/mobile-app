@@ -22,8 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
+import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
 
 @Composable
 fun HomeScreen(
@@ -31,6 +33,9 @@ fun HomeScreen(
     onGalerieClick: () -> Unit,
     onNavigateToRecipes: () -> Unit
 ) {
+
+    val photoViewModel: PhotoViewModel = viewModel()
+
     // Controls whether the image source selection dialog is displayed
     var showImageSourceDialog by remember {
         mutableStateOf(false)
@@ -46,7 +51,11 @@ fun HomeScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri ->
-            selectedImageUri = uri
+            photoViewModel.setSelectedImage(uri)
+
+            if(uri != null){
+                onGalerieClick()
+            }
         }
 
     // Launcher used to open the device camera and capture a picture
@@ -54,7 +63,11 @@ fun HomeScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.TakePicturePreview()
         ) { bitmap ->
-            capturedBitmap = bitmap
+            photoViewModel.setCapturedBitmap(bitmap)
+
+            if(bitmap != null){
+                onCameraClick()
+            }
         }
 
     val context = LocalContext.current
