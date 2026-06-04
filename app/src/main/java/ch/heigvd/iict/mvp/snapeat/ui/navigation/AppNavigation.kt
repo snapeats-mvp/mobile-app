@@ -78,7 +78,8 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) {
             HomeScreen(
-                onTakePhotoClick = { navController.navigate(Screen.RecipesList.route) },
+                onCameraClick = {navController.navigate(Screen.RecipesList.route)},
+                onGalerieClick = {navController.navigate(Screen.RecipesList.route)},
                 onNavigateToRecipes = { navController.navigate(Screen.RecipesList.route) }
             )
         }
