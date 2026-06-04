@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -18,6 +19,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    lint {
+        disable += "AutoboxingStateCreation"
+        disable += "MutableCollectionMutableState"
     }
 
     buildTypes {
@@ -53,6 +59,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
+
+    // Add the dependency for the Firebase AI Logic library When using the BoM,
+    // you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-ai")
+
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
@@ -69,6 +82,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.android.material:material:1.12.0")
+
+    // JSON
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")
