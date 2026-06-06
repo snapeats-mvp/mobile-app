@@ -1,9 +1,8 @@
 package ch.heigvd.iict.mvp.snapeat.model
 
 data class Recipe(
-    val id: String,
     val title: String,
-    val imageUrl: String,
+    val imageUrl: String?,
     val cookingTime: Int,
     val difficulty: String,
     val ingredients: List<Ingredient>,

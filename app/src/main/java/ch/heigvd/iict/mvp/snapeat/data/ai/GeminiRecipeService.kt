@@ -11,7 +11,7 @@ import com.google.gson.Gson
 class GeminiRecipeService {
 
     private val model = Firebase.ai(backend = GenerativeBackend.googleAI())
-        .generativeModel("gemini-3.5-flash")
+        .generativeModel("gemini-2.5-flash")
 
     private val gson = Gson()
 
@@ -79,7 +79,12 @@ class GeminiRecipeService {
         )
 
         try{
-            val json = response.text ?: error("Empty answer")
+            val json = response.text
+                ?.replace("```json", "")
+                ?.replace("```", "")
+                ?.trim()
+                ?: error("Empty answer")
+
             val dto = gson.fromJson(json, RecipeResponseDto::class.java)
             return Result.success(dto)
         }catch (e: Exception){
