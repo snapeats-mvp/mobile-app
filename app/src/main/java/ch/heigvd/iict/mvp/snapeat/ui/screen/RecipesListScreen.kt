@@ -21,6 +21,45 @@ import ch.heigvd.iict.mvp.snapeat.model.Recipe
 import coil.compose.AsyncImage
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
 import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
+import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
+
+@Composable
+fun RecipesRoute(
+    photoViewModel: PhotoViewModel,
+    onRecipeClick: (Recipe) -> Unit,
+    onBackClick: () -> Unit
+) {
+    val state = photoViewModel.uiState
+
+    when {
+        state.isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+                Text("Analyse des ingrédients...")
+            }
+        }
+
+        state.errorMessage != null -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(state.errorMessage)
+            }
+        }
+
+        else -> {
+            RecipesListScreen(
+                recipes = state.recipes,
+                onRecipeClick = onRecipeClick,
+                onBackClick = onBackClick
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

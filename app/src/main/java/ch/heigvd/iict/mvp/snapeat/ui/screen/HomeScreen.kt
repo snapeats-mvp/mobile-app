@@ -29,31 +29,27 @@ import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
 
 @Composable
 fun HomeScreen(
+    photoViewModel: PhotoViewModel,
     onCameraClick: () -> Unit,
     onGalerieClick: () -> Unit,
     onNavigateToRecipes: () -> Unit
 ) {
-
-    val photoViewModel: PhotoViewModel = viewModel()
-
     // Controls whether the image source selection dialog is displayed
     var showImageSourceDialog by remember {
         mutableStateOf(false)
     }
-    // Stores the image selected from the gallery
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null)}
 
-    // Stores the picture captured with the camera
-    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null)}
+    val context = LocalContext.current
 
     // Launcher used to open the device gallery and select an image
     val galleryLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri ->
-            photoViewModel.setSelectedImage(uri)
+            photoViewModel.saveSelectedImage(uri)
 
             if(uri != null){
+                photoViewModel.generateRecipes(context)
                 onGalerieClick()
             }
         }
@@ -63,14 +59,13 @@ fun HomeScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.TakePicturePreview()
         ) { bitmap ->
-            photoViewModel.setCapturedBitmap(bitmap)
+            photoViewModel.saveCapturedBitmap(bitmap)
 
             if(bitmap != null){
+                photoViewModel.generateRecipes(context)
                 onCameraClick()
             }
         }
-
-    val context = LocalContext.current
 
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(
