@@ -32,7 +32,8 @@ fun AppNavigation() {
                 photoViewModel = photoViewModel,
                 onCameraClick = {navController.navigate(Screen.RecipesList.route)},
                 onGalerieClick = {navController.navigate(Screen.RecipesList.route)},
-                onNavigateToRecipes = { navController.navigate(Screen.RecipesList.route) }
+                onNavigateToRecipes = { navController.navigate(Screen.RecipesList.route) },
+                onNavigateToPreferences = { navController.navigate(Screen.Preferences.route) }
             )
         }
 

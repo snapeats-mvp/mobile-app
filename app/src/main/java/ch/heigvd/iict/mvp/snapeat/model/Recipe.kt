@@ -19,7 +19,6 @@ data class Ingredient(
 )
 
 data class UserPreferences(
-    val budgetPerMeal: Float = 20f,
     val dietaryRestrictions: List<DietaryRestriction> = emptyList(),
     val allergies: List<String> = emptyList(),
     val favoriteIngredients: List<String> = emptyList()
