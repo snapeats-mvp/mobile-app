@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import ch.heigvd.iict.mvp.snapeat.data.ai.GeminiRecipeService
 import ch.heigvd.iict.mvp.snapeat.data.ai.dto.toRecipe
 import ch.heigvd.iict.mvp.snapeat.model.Recipe
+import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
 import kotlinx.coroutines.launch
 
 data class RecipesUiState(
@@ -44,7 +45,7 @@ class PhotoViewModel : ViewModel() {
         selectedImageUri = null
     }
 
-    fun generateRecipes(context: Context){
+    fun generateRecipes(context: Context, preferences: UserPreferences){
         viewModelScope.launch{
             uiState = uiState.copy(isLoading = true, errorMessage = null)
 
@@ -53,7 +54,7 @@ class PhotoViewModel : ViewModel() {
                     uriToBitmap(context, it)
                 } ?: error("Aucune image sélectionnée")
 
-                val result = geminiRecipeService.generateRecipesFromImage(bitmap)
+                val result = geminiRecipeService.generateRecipesFromImage(bitmap, preferences)
 
                 result
                     .onSuccess { dto ->

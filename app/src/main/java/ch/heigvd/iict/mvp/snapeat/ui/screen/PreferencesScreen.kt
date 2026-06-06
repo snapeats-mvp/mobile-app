@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class
+)
 
 package ch.heigvd.iict.mvp.snapeat.ui.screen
 
@@ -24,7 +27,6 @@ fun PreferencesScreen(
     onPreferencesChanged: (UserPreferences) -> Unit,
     onCloseClick: () -> Unit
 ) {
-    var budget by remember { mutableStateOf(currentPreferences.budgetPerMeal) }
     var selectedDietary by remember { mutableStateOf(currentPreferences.dietaryRestrictions.toMutableSet()) }
     var selectedAllergies by remember { mutableStateOf(currentPreferences.allergies.toMutableSet()) }
 
@@ -33,28 +35,6 @@ fun PreferencesScreen(
             .fillMaxSize()
             .background(BackgroundBeige)
     ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Mes préférences",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            IconButton(onClick = onCloseClick) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Fermer"
-                )
-            }
-        }
-
         // Content
         LazyColumn(
             modifier = Modifier
@@ -63,40 +43,6 @@ fun PreferencesScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            // Budget Section
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Budget par repas",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Slider(
-                            value = budget,
-                            onValueChange = { budget = it },
-                            valueRange = 5f..100f,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "%.0f€".format(budget),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
-                    }
-                }
-            }
-
             // Dietary Restrictions
             item {
                 Column(
@@ -109,26 +55,36 @@ fun PreferencesScreen(
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    Row(
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         DietaryRestriction.values().forEach { diet ->
                             FilterChip(
                                 selected = selectedDietary.contains(diet),
                                 onClick = {
-                                    if (selectedDietary.contains(diet)) {
-                                        selectedDietary.remove(diet)
-                                    } else {
-                                        selectedDietary.add(diet)
+                                    selectedDietary = selectedDietary.toMutableSet().apply {
+                                        if (contains(diet)) {
+                                            remove(diet)
+                                        } else {
+                                            add(diet)
+                                        }
                                     }
                                 },
                                 label = {
                                     Text(
-                                        text = diet.name.replace("_", " "),
-                                        fontSize = 12.sp
+                                        text = diet.name
+                                            .replace("_", " ")
+                                            .lowercase()
+                                            .replaceFirstChar { it.uppercase() }
                                     )
-                                }
+                                },
+                                shape = MaterialTheme.shapes.medium,
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.error,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onError
+                                )
                             )
                         }
                     }
@@ -162,10 +118,12 @@ fun PreferencesScreen(
                                 Checkbox(
                                     checked = selectedAllergies.contains(allergy),
                                     onCheckedChange = {
-                                        if (it) {
-                                            selectedAllergies.add(allergy)
-                                        } else {
-                                            selectedAllergies.remove(allergy)
+                                        selectedAllergies = selectedAllergies.toMutableSet().apply {
+                                            if (it) {
+                                                add(allergy)
+                                            } else {
+                                                remove(allergy)
+                                            }
                                         }
                                     }
                                 )
@@ -181,28 +139,45 @@ fun PreferencesScreen(
 
             // Save Button
             item {
-                Button(
-                    onClick = {
-                        val updated = currentPreferences.copy(
-                            budgetPerMeal = budget,
-                            dietaryRestrictions = selectedDietary.toList(),
-                            allergies = selectedAllergies.toList()
-                        )
-                        onPreferencesChanged(updated)
-                        onCloseClick()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "Enregistrer",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    OutlinedButton(
+                        onClick = onCloseClick,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Text(
+                            text = "Annuler",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            val updated = currentPreferences.copy(
+                                dietaryRestrictions = selectedDietary.toList(),
+                                allergies = selectedAllergies.toList()
+                            )
+                            onPreferencesChanged(updated)
+                            onCloseClick()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(
+                            text = "Enregistrer",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }

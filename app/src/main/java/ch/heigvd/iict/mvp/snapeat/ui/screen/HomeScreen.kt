@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
 import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
 import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
@@ -30,9 +32,11 @@ import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
 @Composable
 fun HomeScreen(
     photoViewModel: PhotoViewModel,
+    preferences: UserPreferences,
     onCameraClick: () -> Unit,
     onGalerieClick: () -> Unit,
-    onNavigateToRecipes: () -> Unit
+    onNavigateToRecipes: () -> Unit,
+    onNavigateToPreferences: () -> Unit
 ) {
     // Controls whether the image source selection dialog is displayed
     var showImageSourceDialog by remember {
@@ -49,7 +53,7 @@ fun HomeScreen(
             photoViewModel.saveSelectedImage(uri)
 
             if(uri != null){
-                photoViewModel.generateRecipes(context)
+                photoViewModel.generateRecipes(context, preferences)
                 onGalerieClick()
             }
         }
@@ -62,7 +66,7 @@ fun HomeScreen(
             photoViewModel.saveCapturedBitmap(bitmap)
 
             if(bitmap != null){
-                photoViewModel.generateRecipes(context)
+                photoViewModel.generateRecipes(context, preferences)
                 onCameraClick()
             }
         }
@@ -76,108 +80,119 @@ fun HomeScreen(
             }
         }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundBeige)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize().background(BackgroundBeige).padding(24.dp)
     ) {
-        // Logo or Title
-        Text(
-            text = "SnapEats",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 48.dp)
-        )
-
-        // Camera Icon
-        Surface(
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 32.dp),
-            shape = MaterialTheme.shapes.large,
-            color = AccentOrange
+        IconButton(
+            onClick = onNavigateToPreferences,
+            modifier = Modifier.align(Alignment.TopEnd).padding(24.dp)
         ) {
             Icon(
-                //painter = painterResource(id = R.drawable.ic_camera),
-                imageVector = Icons.Filled.PhotoCamera,
-                contentDescription = "Camera",
-                modifier = Modifier
-                    .size(20.dp)
-                    .padding(end = 8.dp),
-                tint = MaterialTheme.colorScheme.onError
+                imageVector = Icons.Filled.Settings,
+                contentDescription = "Préférences"
             )
         }
 
-        // Title
-        Text(
-            text = "Trouvez votre recette",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        // Subtitle
-        Text(
-            text = "Prenez une photo de vos ingrédients et découvrez des recettes personnalisées",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-
-        // Take Photo Button
-        Button(
-            onClick = {
-                showImageSourceDialog = true
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 24.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            ),
-            shape = MaterialTheme.shapes.medium
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                //painter = painterResource(id = R.drawable.ic_camera),
-                imageVector = Icons.Filled.PhotoCamera,
-                contentDescription = "Camera",
+            // Logo or Title
+            Text(
+                text = "SnapEats",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 48.dp)
+            )
+
+            // Camera Icon
+            Surface(
                 modifier = Modifier
-                    .size(20.dp)
-                    .padding(end = 8.dp),
-                tint = MaterialTheme.colorScheme.onError
-            )
-            Text(
-                text = "Prendre une photo",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
+                    .size(100.dp)
+                    .padding(bottom = 32.dp),
+                shape = MaterialTheme.shapes.large,
+                color = AccentOrange
+            ) {
+                Icon(
+                    //painter = painterResource(id = R.drawable.ic_camera),
+                    imageVector = Icons.Filled.PhotoCamera,
+                    contentDescription = "Camera",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(end = 8.dp),
+                    tint = MaterialTheme.colorScheme.onError
+                )
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Browse Recipes Button
-        OutlinedButton(
-            onClick = onNavigateToRecipes,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 24.dp),
-            border = ButtonDefaults.outlinedButtonBorder
-        ) {
+            // Title
             Text(
-                text = "Parcourir les recettes",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                text = "Trouvez votre recette",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
+
+            // Subtitle
+            Text(
+                text = "Prenez une photo de vos ingrédients et découvrez des recettes personnalisées",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            // Take Photo Button
+            Button(
+                onClick = {
+                    showImageSourceDialog = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(horizontal = 24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                ),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Icon(
+                    //painter = painterResource(id = R.drawable.ic_camera),
+                    imageVector = Icons.Filled.PhotoCamera,
+                    contentDescription = "Camera",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(end = 8.dp),
+                    tint = MaterialTheme.colorScheme.onError
+                )
+                Text(
+                    text = "Prendre une photo",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Browse Recipes Button
+            OutlinedButton(
+                onClick = onNavigateToRecipes,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(horizontal = 24.dp),
+                border = ButtonDefaults.outlinedButtonBorder
+            ) {
+                Text(
+                    text = "Parcourir les recettes",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 
