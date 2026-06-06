@@ -30,6 +30,7 @@ fun AppNavigation() {
         composable(Screen.Home.route) {
             HomeScreen(
                 photoViewModel = photoViewModel,
+                preferences = preferences,
                 onCameraClick = {navController.navigate(Screen.RecipesList.route)},
                 onGalerieClick = {navController.navigate(Screen.RecipesList.route)},
                 onNavigateToRecipes = { navController.navigate(Screen.RecipesList.route) },

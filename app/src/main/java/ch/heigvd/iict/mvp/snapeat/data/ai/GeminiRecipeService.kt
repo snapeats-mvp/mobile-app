@@ -3,6 +3,7 @@ package ch.heigvd.iict.mvp.snapeat.data.ai
 import android.graphics.Bitmap
 import android.util.Log
 import ch.heigvd.iict.mvp.snapeat.data.ai.dto.RecipeResponseDto
+import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
@@ -16,11 +17,45 @@ class GeminiRecipeService {
 
     private val gson = Gson()
 
-    suspend fun generateRecipesFromImage(bitmap: Bitmap): Result<RecipeResponseDto> {
+    suspend fun generateRecipesFromImage(bitmap: Bitmap, preferences: UserPreferences): Result<RecipeResponseDto> {
+        val preferencesPrompt =
+            if (
+                preferences.dietaryRestrictions.isEmpty() &&
+                preferences.allergies.isEmpty()
+            ) {
+                "No dietary restrictions or allergies."
+            } else {
+                buildString{
+                    if(preferences.dietaryRestrictions.isNotEmpty()){
+                        appendLine("Dietary restrictions:")
+                        preferences.dietaryRestrictions.forEach{
+                            appendLine("- ${formatPreference(it)}")
+                        }
+                    }
+
+                    if(preferences.allergies.isNotEmpty()){
+                        appendLine("Allergies and intolerances:")
+                        preferences.allergies.forEach{
+                            appendLine("- $it")
+                        }
+                    }
+                }
+            }
+
         val prompt = """
             Analyze this image of food ingredients.
+            
+            User dietary profile:
+            $preferencesPrompt
+            
+            Important rules:
+            - Respect dietary restrictions.
+            - Never use ingredients listed in allergies or intolerances, even if they are visible in the image.
+            - If the detected ingredients conflict with dietary restrictions or allergies, exclude them and suggest alternatives.
 
             Identify the visible ingredients and generate 3 realistic recipes that can be prepared using them.
+            
+            
             
             Return ONLY valid JSON.
             
@@ -96,5 +131,12 @@ class GeminiRecipeService {
             Log.e("GEMINI", "Erreur", e)
             return Result.failure(e)
         }
+    }
+
+    private fun formatPreference(value: Any): String {
+        return value.toString()
+            .replace("_", " ")
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
     }
 }

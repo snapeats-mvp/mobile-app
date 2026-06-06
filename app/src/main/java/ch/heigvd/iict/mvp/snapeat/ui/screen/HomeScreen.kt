@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
 import ch.heigvd.iict.mvp.snapeat.theme.BackgroundBeige
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
 import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
@@ -31,6 +32,7 @@ import ch.heigvd.iict.mvp.snapeat.viewModel.PhotoViewModel
 @Composable
 fun HomeScreen(
     photoViewModel: PhotoViewModel,
+    preferences: UserPreferences,
     onCameraClick: () -> Unit,
     onGalerieClick: () -> Unit,
     onNavigateToRecipes: () -> Unit,
@@ -51,7 +53,7 @@ fun HomeScreen(
             photoViewModel.saveSelectedImage(uri)
 
             if(uri != null){
-                photoViewModel.generateRecipes(context)
+                photoViewModel.generateRecipes(context, preferences)
                 onGalerieClick()
             }
         }
@@ -64,7 +66,7 @@ fun HomeScreen(
             photoViewModel.saveCapturedBitmap(bitmap)
 
             if(bitmap != null){
-                photoViewModel.generateRecipes(context)
+                photoViewModel.generateRecipes(context, preferences)
                 onCameraClick()
             }
         }

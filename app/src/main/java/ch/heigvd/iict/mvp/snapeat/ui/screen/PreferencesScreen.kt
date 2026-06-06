@@ -64,10 +64,12 @@ fun PreferencesScreen(
                             FilterChip(
                                 selected = selectedDietary.contains(diet),
                                 onClick = {
-                                    if (selectedDietary.contains(diet)) {
-                                        selectedDietary.remove(diet)
-                                    } else {
-                                        selectedDietary.add(diet)
+                                    selectedDietary = selectedDietary.toMutableSet().apply {
+                                        if (contains(diet)) {
+                                            remove(diet)
+                                        } else {
+                                            add(diet)
+                                        }
                                     }
                                 },
                                 label = {
@@ -116,10 +118,12 @@ fun PreferencesScreen(
                                 Checkbox(
                                     checked = selectedAllergies.contains(allergy),
                                     onCheckedChange = {
-                                        if (it) {
-                                            selectedAllergies.add(allergy)
-                                        } else {
-                                            selectedAllergies.remove(allergy)
+                                        selectedAllergies = selectedAllergies.toMutableSet().apply {
+                                            if (it) {
+                                                add(allergy)
+                                            } else {
+                                                remove(allergy)
+                                            }
                                         }
                                     }
                                 )
