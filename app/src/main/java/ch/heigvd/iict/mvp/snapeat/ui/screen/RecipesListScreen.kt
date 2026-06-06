@@ -38,6 +38,7 @@ fun RecipesRoute(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
+                Text("Analyse des ingrédients...")
             }
         }
 

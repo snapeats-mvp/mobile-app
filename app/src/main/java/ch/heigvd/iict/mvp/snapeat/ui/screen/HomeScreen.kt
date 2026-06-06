@@ -38,11 +38,6 @@ fun HomeScreen(
     var showImageSourceDialog by remember {
         mutableStateOf(false)
     }
-    // Stores the image selected from the gallery
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null)}
-
-    // Stores the picture captured with the camera
-    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null)}
 
     val context = LocalContext.current
 
@@ -71,8 +66,6 @@ fun HomeScreen(
                 onCameraClick()
             }
         }
-
-
 
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(

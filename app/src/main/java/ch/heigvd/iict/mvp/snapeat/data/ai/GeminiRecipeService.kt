@@ -1,6 +1,7 @@
 package ch.heigvd.iict.mvp.snapeat.data.ai
 
 import android.graphics.Bitmap
+import android.util.Log
 import ch.heigvd.iict.mvp.snapeat.data.ai.dto.RecipeResponseDto
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
@@ -78,6 +79,8 @@ class GeminiRecipeService {
             }
         )
 
+        Log.d("GEMINI", response.text ?: "NULL")
+
         try{
             val json = response.text
                 ?.replace("```json", "")
@@ -85,9 +88,12 @@ class GeminiRecipeService {
                 ?.trim()
                 ?: error("Empty answer")
 
+            Log.d("GEMINI_JSON", json)
+
             val dto = gson.fromJson(json, RecipeResponseDto::class.java)
             return Result.success(dto)
         }catch (e: Exception){
+            Log.e("GEMINI", "Erreur", e)
             return Result.failure(e)
         }
     }
