@@ -63,6 +63,9 @@ class GeminiRecipeService {
             
             Ingredients must contain realistic quantities and units.
             
+            The root JSON value must be an object, not an array.
+            The JSON must start with { and end with }.
+            
             Expected format:
             
             {

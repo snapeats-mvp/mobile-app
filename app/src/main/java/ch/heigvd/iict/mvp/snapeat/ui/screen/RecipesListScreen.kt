@@ -38,7 +38,7 @@ fun RecipesRoute(
                 contentAlignment = Alignment.Center
             ) {
                 Column(
-                    modifier = Modifier.align(Alignment.Center).offset((-80).dp),
+                    modifier = Modifier.align(Alignment.Center).offset(y = (-80).dp),
                     horizontalAlignment =  Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator(
