@@ -37,8 +37,21 @@ fun RecipesRoute(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
-                Text("Analyse des ingrédients...")
+                Column(
+                    modifier = Modifier.align(Alignment.Center).offset((-80).dp),
+                    horizontalAlignment =  Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        strokeWidth = 4.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Text(
+                        text = "Analyse des ingrédients...",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
 
