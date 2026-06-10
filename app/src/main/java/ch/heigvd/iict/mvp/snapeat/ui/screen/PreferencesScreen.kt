@@ -103,7 +103,7 @@ fun PreferencesScreen(
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    val allergiesList = listOf("Gluten", "Lactose", "Arachides", "Fruits à coque")
+                    val allergiesList = listOf("Gluten", "Lactose", "Arachides", "Fruits à coque", "Crustacés", "Mollusques (moules, huîtres, ...)", "Porc")
 
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
