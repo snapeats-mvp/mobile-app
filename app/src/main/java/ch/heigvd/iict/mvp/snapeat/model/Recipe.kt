@@ -15,7 +15,7 @@ data class Ingredient(
     val name: String,
     val quantity: Double,
     val unit: String,
-    val isOptional: Boolean = false
+    val inPhoto: Boolean
 )
 
 data class UserPreferences(
