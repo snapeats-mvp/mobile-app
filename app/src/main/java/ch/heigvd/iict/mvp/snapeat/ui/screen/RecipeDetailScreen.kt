@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ch.heigvd.iict.mvp.snapeat.model.Ingredient
 import ch.heigvd.iict.mvp.snapeat.model.Recipe
 import coil.compose.AsyncImage
 import ch.heigvd.iict.mvp.snapeat.theme.AccentOrange
@@ -28,6 +29,7 @@ fun RecipeDetailScreen(
     onAddToShoppingList: () -> Unit
 ) {
     var showIngredientsToAdd by remember { mutableStateOf(false) }
+    var checkedIngredients by remember(recipe) { mutableStateOf(recipe.ingredients.filter{it.inPhoto}.map{it.name}.toSet()) }
 
     Scaffold(
         topBar = {
@@ -111,8 +113,11 @@ fun RecipeDetailScreen(
                             containerColor = AccentOrange
                         )
                     ) {
+                        val ingredientsToBuy = recipe.ingredients.filter{
+                            !checkedIngredients.contains(it.name)
+                        }
                         Text(
-                            text = "${recipe.ingredients.count { !it.isOptional }} ingrédients à acheter",
+                            text = "${ingredientsToBuy.size} ingrédients à acheter",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -137,7 +142,20 @@ fun RecipeDetailScreen(
                     )
 
                     recipe.ingredients.forEach { ingredient ->
-                        IngredientItem(ingredient = ingredient)
+                        val ingredientKey = ingredient.name
+
+
+                        IngredientItem(
+                            ingredient = ingredient,
+                            checked = checkedIngredients.contains(ingredientKey),
+                            onCheckedChange = { isChecked ->
+                                checkedIngredients = if (isChecked){
+                                    checkedIngredients + ingredientKey
+                                } else {
+                                    checkedIngredients - ingredientKey
+                                }
+                            }
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -196,7 +214,11 @@ fun StatItem(label: String, value: String) {
 }
 
 @Composable
-fun IngredientItem(ingredient: ch.heigvd.iict.mvp.snapeat.model.Ingredient) {
+fun IngredientItem(
+    ingredient: Ingredient,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -206,15 +228,13 @@ fun IngredientItem(ingredient: ch.heigvd.iict.mvp.snapeat.model.Ingredient) {
         Text(
             text = "${ingredient.quantity} ${ingredient.unit} - ${ingredient.name}",
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-            textDecoration = if (ingredient.isOptional) TextDecoration.LineThrough else TextDecoration.None
+            color = MaterialTheme.colorScheme.onSurface
         )
-        if (!ingredient.isOptional) {
-            Checkbox(
-                checked = false,
-                onCheckedChange = {}
-            )
-        }
+
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 

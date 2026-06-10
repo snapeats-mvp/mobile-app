@@ -53,9 +53,9 @@ class GeminiRecipeService {
             - Never use ingredients listed in allergies or intolerances, even if they are visible in the image.
             - If the detected ingredients conflict with dietary restrictions or allergies, exclude them and suggest alternatives.
 
-            Identify the visible ingredients and generate 3 realistic recipes that can be prepared using them.
+            Identify the visible ingredients and generate 3 realistic recipes mainly based on them.
             
-            
+            Some additional ingredients may be added to complete a recipe, but they must be marked with inPhoto = false.
             
             Return ONLY valid JSON.
             
@@ -76,7 +76,7 @@ class GeminiRecipeService {
                       "name": "string",
                       "quantity": 0,
                       "unit": "string",
-                      "optional": false
+                      "inPhoto": true
                     }
                   ],
                   "instructions": [
@@ -99,7 +99,12 @@ class GeminiRecipeService {
             - instructions must contain at least 3 steps.
             - tags must contain between 1 and 5 tags.
             - servings must be a positive integer.
-            - If an ingredient is uncertain, mark it as optional.
+            
+            - For each recipe ingredient:
+              - Set inPhoto = true only if the ingredient is clearly visible in the uploaded image.
+              - Set inPhoto = false if the ingredient is required for the recipe but not visible in the image.
+              - Do not assume an ingredient is visible unless it can actually be seen.
+              - If an ingredient is uncertain, set inPhoto = false.
             
             Do not include markdown.
             Do not include explanations.

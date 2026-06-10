@@ -23,6 +23,6 @@ fun IngredientDto.toIngredient(): Ingredient {
         name = name,
         quantity = quantity,
         unit = unit,
-        isOptional = optional
+        inPhoto = inPhoto
     )
 }
