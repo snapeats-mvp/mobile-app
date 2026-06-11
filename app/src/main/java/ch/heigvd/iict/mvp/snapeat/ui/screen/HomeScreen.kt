@@ -177,22 +177,6 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Browse Recipes Button
-            OutlinedButton(
-                onClick = onNavigateToRecipes,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 24.dp),
-                border = ButtonDefaults.outlinedButtonBorder
-            ) {
-                Text(
-                    text = "Parcourir les recettes",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
         }
     }
 
