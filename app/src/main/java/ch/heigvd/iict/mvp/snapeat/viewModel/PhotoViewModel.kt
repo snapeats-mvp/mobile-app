@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.heigvd.iict.mvp.snapeat.data.ai.GeminiRecipeService
 import ch.heigvd.iict.mvp.snapeat.data.ai.dto.toRecipe
+import ch.heigvd.iict.mvp.snapeat.data.pexels.PexelsService
 import ch.heigvd.iict.mvp.snapeat.model.Recipe
 import ch.heigvd.iict.mvp.snapeat.model.UserPreferences
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ data class RecipesUiState(
 class PhotoViewModel : ViewModel() {
 
     private val geminiRecipeService = GeminiRecipeService()
+    private val pexelsService = PexelsService()
     var selectedImageUri by mutableStateOf<Uri?>(null)
         private set
 
@@ -58,9 +60,18 @@ class PhotoViewModel : ViewModel() {
 
                 result
                     .onSuccess { dto ->
+                        val recipes = dto.recipes.map { it.toRecipe() }
+                        val recipesWithImages = recipes.map { recipe ->
+                            val imageUrl = pexelsService.searchRecipeImage(recipe.title)
+
+                            recipe.copy(
+                                imageUrl = imageUrl
+                            )
+                        }
+
                         uiState = RecipesUiState(
                             isLoading = false,
-                            recipes = dto.recipes.map {it.toRecipe() }
+                            recipes = recipesWithImages
                         )
                     }
                     .onFailure{ e ->

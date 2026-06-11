@@ -1,4 +1,6 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 
 plugins {
     alias(libs.plugins.android.application)
@@ -6,6 +8,17 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+
+if(localPropertiesFile.exists()){
+    localPropertiesFile.inputStream().use {
+        localProperties.load(it)
+    }
+}
+
+val pexelsApiKey = localProperties.getProperty("PEXELS_API_KEY") ?: ""
 
 android {
     namespace = "ch.heigvd.iict.mvp.snapeat"  // ← corrigé
@@ -19,6 +32,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "PEXELS_API_KEY",
+            "\"$pexelsApiKey\""
+        )
     }
 
     lint {
@@ -44,6 +63,7 @@ android {
     // ← ajout obligatoire pour Compose
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -101,4 +121,8 @@ dependencies {
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }
