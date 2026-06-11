@@ -16,6 +16,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
@@ -88,3 +91,16 @@ jobs:
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/
+
+      # Upload on the GitHub Release the APK debug, the APK release and the AAB
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.date_today }}-${{ github.run_number }}
+          name: Release ${{ env.date_today }} #${{ github.run_number }}
+          files: |
+            ${{ env.main_project_module }}/build/outputs/apk/debug/*.apk
+            ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
+            ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
