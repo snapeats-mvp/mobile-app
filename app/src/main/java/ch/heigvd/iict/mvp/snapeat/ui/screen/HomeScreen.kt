@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
+import androidx.compose.foundation.Image
 import ch.heigvd.iict.mvp.snapeat.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -83,15 +84,28 @@ fun HomeScreen(
     Box(
         modifier = Modifier.fillMaxSize().background(BackgroundBeige).padding(24.dp)
     ) {
-        IconButton(
-            onClick = onNavigateToPreferences,
-            modifier = Modifier.align(Alignment.TopEnd).padding(24.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Filled.Settings,
-                contentDescription = "Préférences"
+            Image(
+                painter = painterResource(id = R.drawable.snapeat_logo),
+                contentDescription = "Logo SnapEats",
+                modifier = Modifier.padding(24.dp).size(48.dp)
             )
+
+            IconButton(
+                onClick = onNavigateToPreferences,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Préférences"
+                )
+            }
         }
+
 
         Column(
             modifier = Modifier.fillMaxSize(),
