@@ -1,4 +1,4 @@
-# SnapEats 🍳📸
+# SnapEats
 
 ## Présentation
 
